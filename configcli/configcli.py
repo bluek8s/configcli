@@ -216,7 +216,10 @@ class ConfigCli(cmd.Cmd):
 
         """
         if isinstance(result, list):
-            return ','.join(result)
+            try:
+                return ','.join(result)
+            except Exception:
+                return ','.join(result[0].keys())
         elif isinstance(result, bool):
             return "true" if result else "false"
         elif isinstance(result, str) or isinstance(result, unicode):
