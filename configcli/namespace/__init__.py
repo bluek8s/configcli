@@ -159,9 +159,10 @@ class Namespace(ConfigCLI_Command):
                     currData = nextLevelJsonData[currToken]
                     return self._dig_jsondata_recursive(keyTokenList[1:], currData)
                 else:
-                    nextLevelJsonData = self.validate_List(nextLevelJsonData)
-                    if isinstance(nextLevelJsonData, dict):
-                       return (nextLevelJsonData[keyTokenList[0]], keyTokenList[1:])
+                    if (BDVLIB_REF_KEY_TAG not in nextLevelJsonData):
+                        nextLevelJsonData = self.validate_List(nextLevelJsonData)
+                        if isinstance(nextLevelJsonData, dict):
+                           return (nextLevelJsonData[keyTokenList[0]], keyTokenList[1:])
 
                     # The next token we are looking for is not available. This
                     # is a valid case if we encountered an indirect leaf. So,
