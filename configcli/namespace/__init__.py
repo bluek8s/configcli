@@ -31,6 +31,7 @@ from .services import NamespaceServices
 from .tenant import NamespaceTenant
 from .auth import NamespaceAuth
 from .platform import NamespacePlatform
+from .connections import NamespaceConnections
 
 BDVLIB_REF_KEY_TAG='bdvlibrefkey'
 
@@ -71,6 +72,7 @@ class Namespace(ConfigCLI_Command):
         NamespaceTenant(self)
         NamespaceAuth(self)
         NamespacePlatform(self)
+        NamespaceConnections(self)
 
     def addArgument(self, subparser):
         subparser.add_argument('key', type=str, nargs='?', default='',
@@ -122,6 +124,19 @@ class Namespace(ConfigCLI_Command):
             else:
                 raise e
 
+    def validate_List(self, nextLevelJsonData):
+        if isinstance(nextLevelJsonData, list):
+            try:
+                strData = ','.join(nextLevelJsonData)
+            except Exception:
+                if (len(nextLevelJsonData) > 0):
+                    newNextLevelJsonData = dict()
+                    for data in nextLevelJsonData:
+                        newNextLevelJsonData.update(data)
+                    nextLevelJsonData = newNextLevelJsonData
+
+        return nextLevelJsonData
+
     def _dig_jsondata_recursive(self, keyTokenList, nextLevelJsonData):
         """
         Recursively walk down the dict of dicts until there are no more tokens in
@@ -132,6 +147,7 @@ class Namespace(ConfigCLI_Command):
             # No more key tokens to lookup so, what ever json data we have so
             # far is all we can figure out. Leave it up to the caller to figure
             # out what to do with that data.
+            nextLevelJsonData = self.validate_List(nextLevelJsonData)
             return (nextLevelJsonData, keyTokenList)
         else:
             try:
@@ -143,6 +159,11 @@ class Namespace(ConfigCLI_Command):
                     currData = nextLevelJsonData[currToken]
                     return self._dig_jsondata_recursive(keyTokenList[1:], currData)
                 else:
+                    if (BDVLIB_REF_KEY_TAG not in nextLevelJsonData):
+                        nextLevelJsonData = self.validate_List(nextLevelJsonData)
+                        if isinstance(nextLevelJsonData, dict):
+                           return (nextLevelJsonData[keyTokenList[0]], keyTokenList[1:])
+
                     # The next token we are looking for is not available. This
                     # is a valid case if we encountered an indirect leaf. So,
                     # return the current value along with the remaining key
@@ -193,6 +214,11 @@ class Namespace(ConfigCLI_Command):
             else:
                 # Enforce that there are no more tokens left to be parsed. We
                 # may end up in this situation if the caller included the value
+                if len(remainingTokens) == 1:
+                    return data[remainingTokens[0]]
+                elif len(data) > 0 and len(remainingTokens) > 1:
+                    return data.keys()
+
                 # in the key token list.
                 raise KeyError(keyTokenList)
         elif remainingTokens:
