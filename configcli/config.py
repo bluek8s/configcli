@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 
 import os
-import ConfigParser
+try:
+    from configparser import ConfigParser, NoSectionError, NoOptionError
+except:
+    from ConfigParser import SafeConfigParser as ConfigParser, NoSectionError, NoOptionError
 
 from .constants import *
 
@@ -31,7 +34,7 @@ class CcliConfig(object):
     def __init__(self):
         """
         """
-        self.config = ConfigParser.SafeConfigParser(defaults={
+        self.config = ConfigParser(defaults={
             KEY_LOGDIR              : DEFAULT_LOG_DIR,
             KEY_PRIV_METDATA_FILE   : PRIV_CONFIG_METDATA_FILE,
             KEY_CONFIGMETA_FILE     : PUBLIC_CONFIG_METADATA_FILE,
@@ -58,7 +61,8 @@ class CcliConfig(object):
         """
         try:
             return self.config.get(section, key)
-        except ConfigParser.NoSectionError, ConfigParser.NoOptionError:
+        except NoSectionError as xxx_todo_changeme:
+            NoOptionError = xxx_todo_changeme
             return default
 
     def addOrUpdate(self, section, key, value):

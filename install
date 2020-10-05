@@ -22,4 +22,5 @@ mkdir -p /var/log/guestconfig
 mkdir -p /opt/guestconfig
 chmod a+X /opt/guestconfig /var/log/guestconfig
 
-(cd ${THIS_DIR}; python setup.py install)
+PYTHON_CMD=$(command -v python3 || command -v python)
+(cd ${THIS_DIR}; ${PYTHON_CMD} setup.py install --prefix /usr)

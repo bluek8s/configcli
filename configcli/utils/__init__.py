@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import print_function
+
 from ..constants import ENV_ConfigCLI_DEBUG
 
 import os
@@ -24,13 +24,13 @@ def printKeyVal(key,val):
 
 def printDict(data, header=None, footer=None, indent=4):
     """
-    Print the 'data' based on it's instance type with appropriate indentation.
+    Print the 'data' based on its instance type with appropriate indentation.
     """
     if header != None:
         print(header)
 
     if isinstance(data, dict):
-        for key, value in data.iteritems():
+        for key, value in data.items():
             print(indent * ' ', key, ': ', end='')
             if isinstance(value, dict):
                 printDict(value, indent=indent+4)

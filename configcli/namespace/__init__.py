@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+
 
 import json
 import argparse
+import sys
 
 from .. import ConfigCLI_Command
 from ..errors import KeyError
@@ -34,6 +35,10 @@ from .platform import NamespacePlatform
 from .connections import NamespaceConnections
 
 BDVLIB_REF_KEY_TAG='bdvlibrefkey'
+
+# py2 and py3 compatibility:
+if sys.version_info[0] == 3:
+    unicode = str
 
 class Namespace(ConfigCLI_Command):
     """
@@ -150,29 +155,24 @@ class Namespace(ConfigCLI_Command):
             nextLevelJsonData = self.validate_List(nextLevelJsonData)
             return (nextLevelJsonData, keyTokenList)
         else:
-            try:
-                currToken = keyTokenList[0]
+            currToken = keyTokenList[0]
 
-                if isinstance(nextLevelJsonData, dict) and                     \
-                    (currToken in nextLevelJsonData):
-                    # Recurse to the next level to find the next key token.
-                    currData = nextLevelJsonData[currToken]
-                    return self._dig_jsondata_recursive(keyTokenList[1:], currData)
-                else:
-                    if (BDVLIB_REF_KEY_TAG not in nextLevelJsonData):
-                        nextLevelJsonData = self.validate_List(nextLevelJsonData)
-                        if isinstance(nextLevelJsonData, dict):
-                           return (nextLevelJsonData[keyTokenList[0]], keyTokenList[1:])
+            if isinstance(nextLevelJsonData, dict) and                     \
+                (currToken in nextLevelJsonData):
+                # Recurse to the next level to find the next key token.
+                currData = nextLevelJsonData[currToken]
+                return self._dig_jsondata_recursive(keyTokenList[1:], currData)
+            else:
+                if (BDVLIB_REF_KEY_TAG not in nextLevelJsonData):
+                    nextLevelJsonData = self.validate_List(nextLevelJsonData)
+                    if isinstance(nextLevelJsonData, dict):
+                       return (nextLevelJsonData[keyTokenList[0]], keyTokenList[1:])
 
-                    # The next token we are looking for is not available. This
-                    # is a valid case if we encountered an indirect leaf. So,
-                    # return the current value along with the remaining key
-                    # tokens and let the caller figure out how to proceed.
-                    return (nextLevelJsonData, keyTokenList)
-            except Exception as e:
-                # We are not expecting an exception at this point. May be the
-                # key doesn't exist.
-                raise UnexpectedKeyException(e)
+                # The next token we are looking for is not available. This
+                # is a valid case if we encountered an indirect leaf. So,
+                # return the current value along with the remaining key
+                # tokens and let the caller figure out how to proceed.
+                return (nextLevelJsonData, keyTokenList)
 
     def _resolve_indirections(self, keyTokenList, jsonData):
         """
@@ -210,14 +210,14 @@ class Namespace(ConfigCLI_Command):
             elif not remainingTokens:
                 # No more tokens left which means we found what we are looking
                 # for exactly.
-                return data.keys()
+                return list(data.keys())
             else:
                 # Enforce that there are no more tokens left to be parsed. We
                 # may end up in this situation if the caller included the value
                 if len(remainingTokens) == 1:
                     return data[remainingTokens[0]]
                 elif len(data) > 0 and len(remainingTokens) > 1:
-                    return data.keys()
+                    return list(data.keys())
 
                 # in the key token list.
                 raise KeyError(keyTokenList)

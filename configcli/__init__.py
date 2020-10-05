@@ -13,9 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from abc import ABCMeta, abstractmethod
 
+try:
+    from abc import ABC, abstractmethod
+except:
+    from abc import ABCMeta, abstractmethod
+    class ABC(object):
+        __metaclass__ = ABCMeta
 import argparse, copy
 
 from .utils import isDebug
@@ -23,11 +27,10 @@ from .utils.misc import processArgs
 from .version import __version__
 
 
-class ConfigCLI_SubCommand(object):
+class ConfigCLI_SubCommand(ABC):
     """
 
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, cmdObj, subcmd):
         self.command = cmdObj
@@ -61,11 +64,10 @@ class ConfigCLI_SubCommand(object):
     def complete(self, text, argsList):
         raise Exception("Function must be implemented.")
 
-class ConfigCLI_Command(object):
+class ConfigCLI_Command(ABC):
     """
 
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, ccli, cmd, desc):
         """
@@ -100,9 +102,9 @@ class ConfigCLI_Command(object):
             macro = configcli.getCommandObject('macro')
             nodeMacro = macro.getSubcommandObject('node')
             ...
-            
+
         """
-        if (name != None) and (self.subcommands.has_key(name)):
+        if (name != None) and (name in self.subcommands):
             return self.subcommands[name]
         else:
             return None
@@ -150,13 +152,13 @@ class ConfigCLI_Command(object):
         """
         splits = self._split_line(line.strip())
         if (len(splits) < 2 and text == '') or (len(splits) == 2 and text != ''):
-            completionOpts = copy.deepcopy(self.subcommands.keys())
+            completionOpts = copy.deepcopy(list(self.subcommands.keys()))
             completionOpts.append('-h')
             return [x for x in completionOpts if x.startswith(text)]
         else:
             splits.pop(0)
             return self._invoke_subcmd_complete(splits, text)
 
-from configcli import ConfigCli
+from .configcli import ConfigCli
 
 __all__ = [ "ConfigCli", "__version__" ]

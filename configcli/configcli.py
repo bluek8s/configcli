@@ -13,25 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from __future__ import with_statement
+
+
 
 import os, sys, cmd, pkgutil
 
 from . import ConfigCLI_Command
 
-from utils import isDebug
-from config import CcliConfig
-from utils.log import CcliLog
-from errors import ArgumentParseError, UnknownValueType
-from constants import ConfigCLI_VERSION
+from .utils import isDebug
+from .config import CcliConfig
+from .utils.log import CcliLog
+from .errors import ArgumentParseError, UnknownValueType
+from .constants import ConfigCLI_VERSION
 
-from ccli import Ccli
-from baseimg import Baseimage
-from namespace import Namespace
+from .ccli import Ccli
+from .baseimg import Baseimage
+from .namespace import Namespace
 
 ## macro depends on Namesapce so import it after it.
-from macro import Macro
+from .macro import Macro
+
+# py2 and py3 compatibility:
+if sys.version_info[0] == 3:
+    unicode = str
 
 # # FIXME! test this code
 # EXTENSIONS_PATH = '/opt/bluedata/configcli/extensions'
@@ -87,7 +91,7 @@ class ConfigCli(cmd.Cmd):
             roleId = namespace.getValue('node.role_id')
             distroId = namespace.getValue('node.distro_id')
         """
-        if (name != None) and (self.commands.has_key(name)):
+        if (name != None) and (name in self.commands):
             return self.commands[name]
         else:
             return None
@@ -219,7 +223,7 @@ class ConfigCli(cmd.Cmd):
             try:
                 return ','.join(result)
             except Exception:
-                return ','.join(result[0].keys())
+                return ','.join(list(result[0].keys()))
         elif isinstance(result, bool):
             return "true" if result else "false"
         elif isinstance(result, str) or isinstance(result, unicode):
@@ -238,7 +242,7 @@ class ConfigCli(cmd.Cmd):
     def completedefault(self, *ignored):
         (text, line, begidx, endidx) = ignored
         command = line.strip().split()[0]
-        if self.commands.has_key(command):
+        if command in self.commands:
             return self.commands[command].complete(text, line, begidx, endidx)
         else:
             return cmd.Cmd.completedefault(self, ignored)
