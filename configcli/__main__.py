@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from configcli import ConfigCli as ConfigCli
+from .configcli import ConfigCli as ConfigCli
 import sys, argparse
 
 

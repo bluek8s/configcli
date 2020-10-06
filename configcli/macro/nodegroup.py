@@ -64,14 +64,14 @@ class MacroNodegroup(ConfigCLI_SubCommand):
         """
         Get node FQDNs that belong to the same nodegroup as the current node.
         """
-        LocalNodeGrpId = self.command.configmeta.getWithTokens([u"node", u"nodegroup_id"])
+        LocalNodeGrpId = self.command.configmeta.getWithTokens(["node", "nodegroup_id"])
         return self.getNodegroupFqdns(LocalNodeGrpId)
 
     def getClusterFqdns(self):
         """
         Get node FQDNs in the cluster.
         """
-        NodeGroups = self.command.configmeta.getWithTokens([u"nodegroups"])
+        NodeGroups = self.command.configmeta.getWithTokens(["nodegroups"])
 
         fqdnList = []
         for ng in NodeGroups:
@@ -84,9 +84,9 @@ class MacroNodegroup(ConfigCLI_SubCommand):
         """
         Get node FQDNs that are part of the given nodegroup.
         """
-        matchedKeyTokenLists = self.command.configmeta.searchForToken([u"nodegroups",
+        matchedKeyTokenLists = self.command.configmeta.searchForToken(["nodegroups",
                                                                         str(nodeGroupId)],
-                                                                      u"fqdns")
+                                                                      "fqdns")
         if len(matchedKeyTokenLists) == 0:
             raise KeyError("No nodegroup %s found." % (nodeGroupId))
 
@@ -99,13 +99,13 @@ class MacroNodegroup(ConfigCLI_SubCommand):
             else:
                 dupslist.append(val)
 
-        return dict.fromkeys(dupslist).keys()
+        return list(dict.fromkeys(dupslist).keys())
 
     def getNumNodegroups(self):
         """
         Returns count of nodegroups in this cluster.
         """
-        return len(self.command.configmeta.getWithTokens([u"nodegroups"]))
+        return len(self.command.configmeta.getWithTokens(["nodegroups"]))
 
     def complete(self, text, argsList):
         return []

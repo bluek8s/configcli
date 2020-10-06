@@ -67,7 +67,7 @@ class MacroNode(ConfigCLI_SubCommand):
         """
         Calculate node index given a node_id
         """
-        all_node_id_keys = self.command.configmeta.searchForToken([u"nodegroups"], u"node_ids")
+        all_node_id_keys = self.command.configmeta.searchForToken(["nodegroups"], "node_ids")
 
         node_id_list = []
         for node_id_key in all_node_id_keys:
@@ -84,7 +84,7 @@ class MacroNode(ConfigCLI_SubCommand):
         """
         Return the node index of current node
         """
-        node_id = self.command.configmeta.getWithTokens([u"node", u"id"])
+        node_id = self.command.configmeta.getWithTokens(["node", "id"])
         return self._getNodeIndexFromId(node_id)
 
     def getNodeIndexFromFqdn(self, fqdn):
@@ -98,13 +98,13 @@ class MacroNode(ConfigCLI_SubCommand):
         """
         Return node id of current node
         """
-        return self.command.configmeta.getWithTokens([u"node", u"id"])
+        return self.command.configmeta.getWithTokens(["node", "id"])
 
     def getNodeIdFromFqdn(self, fqdn):
         """
         Return the node id of a given fqdn
         """
-        all_fqdn_keys = self.command.configmeta.searchForToken([u"nodegroups"], u"fqdn_mappings")
+        all_fqdn_keys = self.command.configmeta.searchForToken(["nodegroups"], "fqdn_mappings")
         for fqdn_key in all_fqdn_keys:
             fqdn_token_list = self.command.configmeta.searchForToken(fqdn_key, fqdn)
             if fqdn_token_list != []:
