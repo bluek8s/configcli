@@ -22,4 +22,15 @@ mkdir -p /var/log/guestconfig
 mkdir -p /opt/guestconfig
 chmod a+X /opt/guestconfig /var/log/guestconfig
 
-(cd ${THIS_DIR}; python setup.py install --install-scripts /usr/bin)
+if [[ "$1" == "--new" ]]
+then
+    scripthome=$(python -c 'import site; print(site.USER_BASE)')/bin
+    installdir=$(python -c 'import site; print(site.USER_SITE)')
+    mkdir -p "$installdir"
+    installarg="--user"
+else
+    scripthome="/usr/bin"
+    installarg=""
+fi
+
+(cd ${THIS_DIR}; python setup.py install "$installarg" --install-scripts="$scripthome")
