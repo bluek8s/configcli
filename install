@@ -27,10 +27,10 @@ then
     scripthome=$(python -c 'import site; print(site.USER_BASE)')/bin
     installdir=$(python -c 'import site; print(site.USER_SITE)')
     mkdir -p "$installdir"
-    installarg="--user"
+    installarg="install --user"
 else
     scripthome="/usr/bin"
-    installarg=""
+    installarg="install"
 fi
 
-(cd ${THIS_DIR}; python setup.py install "$installarg" --install-scripts="$scripthome")
+(cd ${THIS_DIR}; python setup.py $installarg --install-scripts="$scripthome")
